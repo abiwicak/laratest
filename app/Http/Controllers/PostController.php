@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+use App\Post;
+use App\User;
 
 class PostController extends Controller
 {
@@ -13,7 +17,9 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        $posts = Post::all();
+
+        return view('post.index', ['posts' => $posts]);
     }
 
     /**
@@ -23,7 +29,9 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        $auth = Auth::user();
+
+        return view('post.create',['auth' => $auth]);
     }
 
     /**
@@ -34,7 +42,19 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // dd($request);
+        $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'text' => ['required', 'string'],
+        ]);
+
+        Post::create([
+            "title" => $request->title,
+            "text" => $request->text,
+            "user_id" => $request->user_id,
+        ]);
+
+        return redirect('/post')->with('status','Post created successfully!');
     }
 
     /**
@@ -43,9 +63,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Post $post)
     {
-        //
+        return view('post.show', ['post' => $post]);
     }
 
     /**
@@ -54,9 +74,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Post $post)
     {
-        //
+        return view('post.edit', ['post' => $post]);
     }
 
     /**
