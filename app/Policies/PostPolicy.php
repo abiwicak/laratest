@@ -2,10 +2,13 @@
 
 namespace App\Policies;
 
+use App\Post;
 use App\User;
+
+use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class UserPolicy
+class PostPolicy
 {
     use HandlesAuthorization;
 
@@ -17,24 +20,19 @@ class UserPolicy
      */
     public function viewAny(User $user)
     {
-        foreach ($user->roles as $role){
-            return $role->name === "Administrator";
-        }
+        
     }
 
     /**
      * Determine whether the user can view the model.
      *
      * @param  \App\User  $user
-     * @param  \App\User  $model
+     * @param  \App\Post  $post
      * @return mixed
      */
-    public function view(User $user, User $model)
+    public function view(User $user, Post $post)
     {
-        foreach ($user->roles as $role){
-            // dd($role->name);
-            return $role->name === "Administrator";
-        }
+        
     }
 
     /**
@@ -45,22 +43,23 @@ class UserPolicy
      */
     public function create(User $user)
     {
-        foreach ($user->roles as $role){
-            return $role->name === "Administrator";
-        }
+        //
     }
 
     /**
      * Determine whether the user can update the model.
      *
      * @param  \App\User  $user
-     * @param  \App\User  $model
+     * @param  \App\Post  $post
      * @return mixed
      */
-    public function update(User $user, User $model)
+    public function update(User $user, Post $post)
     {
         foreach ($user->roles as $role){
-            return $role->name === "Administrator" || $user->id === $model->id;
+
+            return $user->id === $post->id || $role === "Editor" || $role === "Administrator"
+                ? Response::allow()
+                : Response::deny("You don't have access to this post!");
         }
     }
 
@@ -68,13 +67,15 @@ class UserPolicy
      * Determine whether the user can delete the model.
      *
      * @param  \App\User  $user
-     * @param  \App\User  $model
+     * @param  \App\Post  $post
      * @return mixed
      */
-    public function delete(User $user, User $model)
+    public function delete(User $user, Post $post)
     {
         foreach ($user->roles as $role){
-            return $role->name === "Administrator";
+            return $user->id === $post->id || $role === "Editor" || $role === "Administrator"
+                ? Response::allow()
+                : Response::deny("You don't have access to delete!");
         }
     }
 
@@ -82,27 +83,23 @@ class UserPolicy
      * Determine whether the user can restore the model.
      *
      * @param  \App\User  $user
-     * @param  \App\User  $model
+     * @param  \App\Post  $post
      * @return mixed
      */
-    public function restore(User $user, User $model)
+    public function restore(User $user, Post $post)
     {
-        foreach ($user->roles as $role){
-            return $role->name === "Administrator";
-        }
+        //
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\User  $user
-     * @param  \App\User  $model
+     * @param  \App\Post  $post
      * @return mixed
      */
-    public function forceDelete(User $user, User $model)
+    public function forceDelete(User $user, Post $post)
     {
-        foreach ($user->roles as $role){
-            return $role->name === "Administrator";
-        }
+        //
     }
 }

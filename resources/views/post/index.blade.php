@@ -34,7 +34,7 @@
                                     <a href="post/{{$post->id}}/edit" class="btn btn-sm btn-outline-primary">Edit</a>
                                     <button data-delete="{{$post}}"
                                         data-type="post"
-                                        type="button" class="btn btn-sm btn-outline-danger postdeletebtn"
+                                        type="button" class="btn btn-sm btn-outline-danger deletebtn"
                                         data-toggle="modal" data-target="#deleteModal">
                                             Delete
                                     </button>

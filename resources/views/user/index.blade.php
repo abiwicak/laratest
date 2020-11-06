@@ -40,7 +40,7 @@
                                     <a href="user/{{$user->id}}/edit" class="btn btn-sm btn-outline-primary">Edit</a>
                                     <button data-delete="{{$user}}"
                                         data-type="user"
-                                        type="button" class="btn btn-sm btn-outline-danger userdeletebtn"
+                                        type="button" class="btn btn-sm btn-outline-danger deletebtn"
                                         data-toggle="modal" data-target="#deleteModal">
                                             Delete
                                     </button>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 use App\Post;
 use App\User;
@@ -76,7 +77,14 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        return view('post.edit', ['post' => $post]);
+        $response = Gate::inspect('update', $post);
+
+        if ($response->allowed()) {
+            return view('post.edit', ['post' => $post]);
+        } else {
+            return redirect('/post')->with('status',$response->message());
+        }
+
     }
 
     /**
@@ -86,9 +94,19 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request,Post $post)
     {
-        //
+        $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'text' => ['required', 'string'],
+        ]);
+
+        $post->update([
+            "title" => $request->title,
+            "text" => $request->text
+        ]);
+
+        return redirect('/post')->with('status','Post updated successfully!');
     }
 
     /**
@@ -97,8 +115,17 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Post $post)
     {
-        //
+        $response = Gate::inspect('delete', $post);
+
+        if ($response->allowed()) {
+            $post->delete();
+            return redirect('/post')->with('status','Post deleted successfully!');
+        } else {
+            return redirect('/post')->with('status',$response->message());
+        }
+        
+
     }
 }

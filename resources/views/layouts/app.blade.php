@@ -50,7 +50,7 @@
                                 </li>
                             @endif
                             @else
-                            @if (Gate::allows('view-users'))
+                            @if (Gate::allows('admin'))
                                 <li class="nav-item">
                                     <a class="nav-link" href="/user">{{ __('User') }}</a>
                                 </li>
@@ -64,6 +64,7 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="/user/{{Auth::user()->id}}/edit">{{ __('Profile') }}</a>
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                         onclick="event.preventDefault();
                                                         document.getElementById('logout-form').submit();">

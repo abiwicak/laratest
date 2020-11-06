@@ -40,6 +40,7 @@
                             </div>
                         </div>
 
+                        @if (Gate::allows('admin'))
                         <div class="form-group row">
                             <label for="role_id[]" class="col-md-4 col-form-label text-md-right">{{ __('Role') }}</label>
                             
@@ -58,6 +59,7 @@
                                 @endforeach
                             </div>
                         </div>
+                        @endif
 
                         <div class="form-group row">
                             <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}</label>
@@ -73,19 +75,17 @@
                             </div>
                         </div>
 
-                        <!-- <div class="form-group row">
-                            <label for="password-confirm" class="col-md-4 col-form-label text-md-right">{{ __('Confirm Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" autocomplete="new-password">
-                            </div>
-                        </div> -->
-
                         <div class="form-group row mb-0">
                             <div class="col-md-6 offset-md-4">
+                            @if (Gate::allows('admin'))
                                 <a href="/user" class="btn btn-outline-secondary">
                                     {{ __('Cancel') }}
                                 </a>
+                            @else
+                                <a href="/post" class="btn btn-outline-secondary">
+                                    {{ __('Cancel') }}
+                                </a>
+                            @endif
                                 <button type="submit" class="btn btn-outline-primary">
                                     {{ __('Save') }}
                                 </button>
