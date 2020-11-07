@@ -32,7 +32,6 @@ class UserPolicy
     public function view(User $user, User $model)
     {
         foreach ($user->roles as $role){
-            // dd($role->name);
             return $role->name === "Administrator";
         }
     }
@@ -87,9 +86,7 @@ class UserPolicy
      */
     public function restore(User $user, User $model)
     {
-        foreach ($user->roles as $role){
-            return $role->name === "Administrator";
-        }
+
     }
 
     /**

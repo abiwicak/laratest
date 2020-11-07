@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 use App\User;
 use App\Role;
@@ -85,9 +87,6 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        // dd($user->roles->id);
-        // $user = User::find($id);
-
         return view('user.show', ['user' => $user]);
     }
 
@@ -117,12 +116,6 @@ class UserController extends Controller
             'email' => 'required'
         ]);
 
-        // $user->update([
-        //     'name' => $request->name,
-        //     'email' => $request->email,
-            // 'password' => Hash::make($request->password),
-        // ])->roles()->attach($request->role_id);
-        
         $data = $user;
         
         $data->name = $request->name;
@@ -132,8 +125,11 @@ class UserController extends Controller
         }
         $data->save();
         $data->roles()->sync($request->role_id);
-
-        return redirect('/user')->with('status','User register succsessfully!');
+        if (Gate::allows('admin')){
+            return redirect('/user')->with('status','User updated succsessfully!');
+        }else {
+            return redirect('/post')->with('status','Profile updated succsessfully!');
+        }
     }
 
     /**

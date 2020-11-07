@@ -57,7 +57,7 @@ class PostPolicy
     {
         foreach ($user->roles as $role){
 
-            return $user->id === $post->id || $role === "Editor" || $role === "Administrator"
+            return $user->id === $post->user->id || $role->name === "Editor" || $role->name === "Administrator"
                 ? Response::allow()
                 : Response::deny("You don't have access to this post!");
         }
@@ -73,7 +73,7 @@ class PostPolicy
     public function delete(User $user, Post $post)
     {
         foreach ($user->roles as $role){
-            return $user->id === $post->id || $role === "Editor" || $role === "Administrator"
+            return $user->id === $post->user->id || $role->name === "Editor" || $role->name === "Administrator"
                 ? Response::allow()
                 : Response::deny("You don't have access to delete!");
         }
