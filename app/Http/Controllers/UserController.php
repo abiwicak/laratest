@@ -15,8 +15,8 @@ class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
-        $this->authorizeResource(User::class, 'user');
+        // $this->middleware('auth');
+        // $this->authorizeResource(User::class, 'user');
     }
 
     /**
@@ -40,8 +40,11 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
-        return view('user.index', ['users' => $users]);
+        if(Gate::allows('admin')){
+            $users = User::all();
+            return view('user.index', ['users' => $users]);
+        }
+        return redirect('/post')->with('error', 'You not administrator');
     }
 
     /**
@@ -51,8 +54,12 @@ class UserController extends Controller
      */
     public function create()
     {
-        $roles = Role::all();
-        return view('user.create', ['roles' => $roles]);
+        if(Gate::allows('admin')){
+
+            $roles = Role::all();
+            return view('user.create', ['roles' => $roles]);
+        }
+        return redirect('/post')->with('error', 'You not administrator');
     }
 
     /**
@@ -69,14 +76,18 @@ class UserController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
+        if(Gate::allows('admin')){
+            
+            User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ])->roles()->attach($request->role_id);
+    
+            return redirect('/user')->with('status','User register succsessfully!');
+        }
+        return redirect('/post')->with('error', 'You not administrator');
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ])->roles()->attach($request->role_id);
-
-        return redirect('/user')->with('status','User register succsessfully!');
     }
 
     /**
@@ -87,7 +98,10 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        return view('user.show', ['user' => $user]);
+        if(Gate::allows('admin')){
+            return view('user.show', ['user' => $user]);
+        }
+        return redirect('/post')->with('error', 'You not administrator');
     }
 
     /**
@@ -98,8 +112,12 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        $roles = Role::all();
-        return view('user.edit',['user' => $user, 'roles' => $roles]);
+        if(Gate::any(['admin','self'], $user)){
+            $roles = Role::all();
+            return view('user.edit',['user' => $user, 'roles' => $roles]);
+        }
+            return redirect('/post')->with('error', 'You not administrator');
+        
     }
 
     /**
@@ -115,21 +133,24 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required'
         ]);
-
-        $data = $user;
         
-        $data->name = $request->name;
-        $data->email = $request->email;
-        if ($request->password !== null){
-            $data->password = bcrypt($request->password);
+        if(Gate::any(['admin','self'], $user)){
+            $data = $user;
+            
+            $data->name = $request->name;
+            $data->email = $request->email;
+            if ($request->password !== null){
+                $data->password = bcrypt($request->password);
+            }
+            $data->save();
+            $data->roles()->sync($request->role_id);
+            if (Gate::allows('admin')){
+                return redirect('/user')->with('status','User updated succsessfully!');
+            }else {
+                return redirect('/post')->with('status','Profile updated succsessfully!');
+            }
         }
-        $data->save();
-        $data->roles()->sync($request->role_id);
-        if (Gate::allows('admin')){
-            return redirect('/user')->with('status','User updated succsessfully!');
-        }else {
-            return redirect('/post')->with('status','Profile updated succsessfully!');
-        }
+        return redirect('/post')->with('error', 'You not administrator');
     }
 
     /**
@@ -140,8 +161,11 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        $user->delete();
-
-        return redirect('/user')->with('status','User deleted succsessfully!');
+        if(Gate::allows('admin')){
+            $user->delete();
+    
+            return redirect('/user')->with('status','User deleted succsessfully!');
+        }
+        return redirect('/post')->with('error', 'You not administrator');
     }
 }

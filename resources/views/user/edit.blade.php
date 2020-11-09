@@ -59,6 +59,17 @@
                                 @endforeach
                             </div>
                         </div>
+                        @else
+                        <div class="form-group row">
+                            <label for="" class="col-md-4 col-form-label text-md-right">{{ __('Role') }}</label>
+                            
+                            <div class="col-md-6">
+                                @foreach ($user->roles as $role)
+                                    <input  name="role_name" class="form-control @error('role') is-invalid @enderror" type="text" value="{{ $role->name }}" readonly>
+                                    <input  name="role_id[]" class="form-control @error('role') is-invalid @enderror" type="text" value="{{ $role->id }}" hidden>
+                                @endforeach
+                            </div>
+                        </div>
                         @endif
 
                         <div class="form-group row">

@@ -13,8 +13,6 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        User::class => UserPolicy::class,
-        Post::class => PostPolicy::class
     ];
 
     /**
@@ -30,6 +28,14 @@ class AuthServiceProvider extends ServiceProvider
             foreach ($user->roles as $role){
                 return $role->name == 'Administrator';
             }
+        });
+        Gate::define('editor', function ($user) {
+            foreach ($user->roles as $role){
+                return $role->name == 'Editor';
+            }
+        });
+        Gate::define('self', function ($user, $self) {
+                return $user->id == $self->id;
         });
     }
 }

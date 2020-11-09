@@ -14,11 +14,17 @@
                             {{ session('status') }}
                         </div>
                     @endif
+                    @if (session('error'))
+                        <div class="alert alert-danger" role="alert">
+                            {{ session('error') }}
+                        </div>
+                    @endif
                     <a href="post/create" class="btn btn-sm btn-warning">{{ __('Create post') }}</a>
                     <table class="table table-bordered mt-2">
                         <thead>
                             <tr>
                                 <th>No</th>
+                                <th>User Name</th>
                                 <th>Title</th>
                                 <th>Text</th>
                                 <th class="col-2">Option</th>
@@ -27,9 +33,10 @@
                         <tbody>
                             @foreach($posts as $post)
                             <tr>
-                                <td>{{ $loop->iteration}}</td>
-                                <td>{{$post->title}}</td>
-                                <td>{{$post->text}}</td>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $post->user->name }}</td>
+                                <td>{{ $post->title }}</td>
+                                <td>{{ Str::limit($post->text, 60) }}</td>
                                 <td><a href="post/{{$post->id}}" class="btn btn-sm btn-outline-success">Show</a>
                                     <a href="post/{{$post->id}}/edit" class="btn btn-sm btn-outline-primary">Edit</a>
                                     <button data-delete="{{$post}}"

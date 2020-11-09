@@ -11,6 +11,7 @@ use App\User;
 
 class PostController extends Controller
 {
+    
     /**
      * Display a listing of the resource.
      *
@@ -76,13 +77,13 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        $response = Gate::inspect('update', $post);
-
-        if ($response->allowed()) {
+        $user = $post->user;
+        
+        if (Gate::any(['admin','editor','self'], $user)) {
             return view('post.edit', ['post' => $post]);
-        } else {
-            return redirect('/post')->with('status',$response->message());
         }
+            return redirect('/post')->with('error','You do not have access this post!');
+        
 
     }
 
@@ -95,17 +96,21 @@ class PostController extends Controller
      */
     public function update(Request $request,Post $post)
     {
-        $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'text' => ['required', 'string'],
-        ]);
+        $user = $post->user;
+        if (Gate::any(['admin','editor','self'], $user)) {
+            $request->validate([
+                'title' => ['required', 'string', 'max:255'],
+                'text' => ['required', 'string'],
+            ]);
 
-        $post->update([
-            "title" => $request->title,
-            "text" => $request->text
-        ]);
+            $post->update([
+                "title" => $request->title,
+                "text" => $request->text
+            ]);
 
-        return redirect('/post')->with('status','Post updated successfully!');
+            return redirect('/post')->with('status','Post updated successfully!');
+        }
+        return redirect('/post')->with('error','You do not have access this post!');
     }
 
     /**
@@ -116,14 +121,12 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        $response = Gate::inspect('delete', $post);
-
-        if ($response->allowed()) {
+        $user = $post->user;
+        if (Gate::any(['admin','editor','self'], $user)) {
             $post->delete();
             return redirect('/post')->with('status','Post deleted successfully!');
-        } else {
-            return redirect('/post')->with('status',$response->message());
         }
+        return redirect('/post')->with('error','You do not have access this post!');
         
 
     }
